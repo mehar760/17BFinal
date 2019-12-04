@@ -1,0 +1,395 @@
+//
+//  main.cpp
+//
+//  Created by william herrera.
+//  Copyright © 2019 william herrera. All rights reserved.
+//
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include "nano_engine.h"
+using namespace std;
+
+/*	Temporary Timer class taken from website	*/
+//============================================================================================
+class LTimer
+{
+public:
+	//Initializes variables
+	LTimer();
+
+	//The various clock actions
+	void start();
+	void stop();
+	void pause();
+	void unpause();
+
+	//Gets the timer's time
+	Uint32 getTicks();
+
+	//Checks the status of the timer
+	bool isStarted();
+	bool isPaused();
+
+private:
+	//The clock time when the timer started
+	Uint32 mStartTicks;
+
+	//The ticks stored when the timer was paused
+	Uint32 mPausedTicks;
+
+	//The timer status
+	bool mPaused;
+	bool mStarted;
+};
+
+LTimer::LTimer()
+{
+	//Initialize the variables
+	mStartTicks = 0;
+	mPausedTicks = 0;
+
+	mPaused = false;
+	mStarted = false;
+}
+
+void LTimer::start()
+{
+	//Start the timer
+	mStarted = true;
+
+	//Unpause the timer
+	mPaused = false;
+
+	//Get the current clock time
+	mStartTicks = SDL_GetTicks();
+	mPausedTicks = 0;
+}
+
+void LTimer::stop()
+{
+	//Stop the timer
+	mStarted = false;
+
+	//Unpause the timer
+	mPaused = false;
+
+	//Clear tick variables
+	mStartTicks = 0;
+	mPausedTicks = 0;
+}
+
+void LTimer::pause()
+{
+	//If the timer is running and isn't already paused
+	if (mStarted && !mPaused)
+	{
+		//Pause the timer
+		mPaused = true;
+
+		//Calculate the paused ticks
+		mPausedTicks = SDL_GetTicks() - mStartTicks;
+		mStartTicks = 0;
+	}
+}
+
+void LTimer::unpause()
+{
+	//If the timer is running and paused
+	if (mStarted && mPaused)
+	{
+		//Unpause the timer
+		mPaused = false;
+
+		//Reset the starting ticks
+		mStartTicks = SDL_GetTicks() - mPausedTicks;
+
+		//Reset the paused ticks
+		mPausedTicks = 0;
+	}
+}
+
+Uint32 LTimer::getTicks()
+{
+	//The actual timer time
+	Uint32 time = 0;
+
+	//If the timer is running
+	if (mStarted)
+	{
+		//If the timer is paused
+		if (mPaused)
+		{
+			//Return the number of ticks when the timer was paused
+			time = mPausedTicks;
+		}
+		else
+		{
+			//Return the current time minus the start time
+			time = SDL_GetTicks() - mStartTicks;
+		}
+	}
+	return time;
+}
+
+bool LTimer::isStarted()
+{
+	//Timer is running and paused or unpaused
+	return mStarted;
+}
+
+bool LTimer::isPaused()
+{
+	//Timer is running and paused
+	return mPaused && mStarted;
+}
+
+//============================================================================================
+
+int scancode = 0;
+bool isquit = false;
+/*	Player Class	*/
+//============================================================================================
+class Player {
+public:
+
+	int playerNum = 0;
+	const char* file;	
+	float xPos = 0;
+	float yPos = 0;
+	float v_x = 0;
+	float v_y = 0;
+
+	int changedPos;
+		
+
+	Nano_Texture* playerTex;
+	Nano_Rect rect;
+	Nano_Texture* trail;
+	
+	vector<Nano_Rect> trails;
+	vector<Nano_Rect> trails2;
+	
+	Nano_Rect activeTrail;
+
+
+	void init(int player, float x, float y, const char* file_path) {
+		playerNum = player;
+		xPos = x;
+		yPos = y;
+		file = file_path;	
+	}
+
+	void draw() {
+		playerTex = Nano_LoadTexture(file);
+		rect = { (int)xPos, (int)yPos, 10, 10 };
+		
+		trail = playerTex;
+
+		activeTrail = { (int)xPos, (int)yPos, 10, 10 };	
+	}
+
+	void getInput() {
+		
+		if (playerNum == 1) {
+			switch (scancode) {
+
+				/*PLAYER 1 INPUTS */
+						
+			case SDL_SCANCODE_RIGHT:
+				changedPos = xPos;
+				trails.push_back(activeTrail);
+				activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+				if (v_x != 0 || v_y != 0) {
+					v_x = 0;
+					v_y = 0;
+				}
+				v_x += 200;
+				break;
+			case SDL_SCANCODE_LEFT:
+				changedPos = xPos;
+				trails.push_back(activeTrail);
+				activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+				if (v_x != 0 || v_y != 0) {
+					v_x = 0;
+					v_y = 0;
+				}
+				v_x -= 200;
+				break;
+			case SDL_SCANCODE_UP:
+				changedPos = yPos;
+				trails.push_back(activeTrail);
+				activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+				if (v_x != 0 || v_y != 0) {
+					v_x = 0;
+					v_y = 0;
+				}
+				v_y -= 200;
+				break;
+			case SDL_SCANCODE_DOWN:
+				changedPos = yPos;
+				trails.push_back(activeTrail);
+				activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+				if (v_x != 0 || v_y != 0) {
+					v_x = 0;
+					v_y = 0;
+				}
+				v_y += 200;
+				break;
+			}
+		}
+
+		if (playerNum == 2) {
+			switch (scancode) {
+						
+					/*PLAYER 1 INPUTS */
+						
+			case SDL_SCANCODE_D:
+				changedPos = xPos;
+				trails.push_back(activeTrail);
+				activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+				if (v_x != 0 || v_y != 0) {
+					v_x = 0;
+					v_y = 0;
+				}
+				v_x += 200;
+				break;
+			case SDL_SCANCODE_A:
+				changedPos = xPos;
+				trails.push_back(activeTrail);
+				activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+				if (v_x != 0 || v_y != 0) {
+					v_x = 0;
+					v_y = 0;
+				}
+				v_x -= 200;
+				break;
+			case SDL_SCANCODE_W:
+				changedPos = yPos;
+				trails.push_back(activeTrail);
+				activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+				if (v_x != 0 || v_y != 0) {
+					v_x = 0;
+					v_y = 0;
+				}
+				v_y -= 200;
+				break;
+			case SDL_SCANCODE_S:
+				changedPos = yPos;
+				trails.push_back(activeTrail);
+				activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+				if (v_x != 0 || v_y != 0) {
+					v_x = 0;
+					v_y = 0;
+				}
+				v_y += 200;
+				break;
+			}
+		}		
+	};
+
+	void move(float timeStep) {
+		xPos += v_x * timeStep;
+		yPos += v_y * timeStep;
+
+		xPos += v_x * timeStep;
+		yPos += v_y * timeStep;
+
+		//render player	
+		rect.x = xPos;
+		rect.y = yPos;
+		
+		if (v_x > 0) {
+			activeTrail.w = xPos - activeTrail.x;
+		}
+		if (v_x < 0) {
+			activeTrail.x = xPos + 11;
+			activeTrail.w = changedPos - xPos;
+		}
+		if (v_y > 0) {
+			activeTrail.h = yPos - activeTrail.y;
+		}
+		if (v_y < 0) {
+			activeTrail.y = yPos + 11;
+			activeTrail.h = changedPos - yPos;
+		}	
+	}
+};
+
+/*	Event Manager Class	*/
+//============================================================================================
+class GameState {
+public:
+	void inputHandler(Player& player, Player& player2, Nano_Event& event);
+	void update(Player& player);
+	void checkCollision(Player& player, Player& player2);
+};
+	
+	
+void GameState::inputHandler(Player& player, Player& player2, Nano_Event& event) {
+	if (Nano_PollEvent(&event))
+	{
+		if (Nano_QuitEvent(&event)) {
+			isquit = true;
+		}
+		if (Nano_KeyDownEvent(&event, &scancode)) {
+			player.getInput();
+			player2.getInput();
+		}
+	}
+}
+
+void GameState::update(Player& player) {	
+		Nano_RenderCopy(player.playerTex, NULL, &player.rect);
+		Nano_RenderCopy(player.playerTex, NULL, &player.activeTrail);
+
+		for (int i = 0; i < player.trails.size(); i++) {
+			Nano_RenderCopy(player.playerTex, NULL, &player.trails[i]);		
+		}
+}
+//============================================================================================
+
+
+/*	Main	*/
+//============================================================================================
+int main(int argc, char* argv[])
+{
+	Nano_Init();
+	Nano_CreateRenderer("window", 100, 100, 640, 480);
+	
+	LTimer stepTimer;
+	GameState gamestate;
+
+	//Event handler
+	Nano_Event event;
+	
+	Player player1;
+	player1.init(1, 50, 50, "Assets/blue_solid.bmp");
+
+	Player player2;
+	player2.init(2, 100, 100, "Assets/blue_solid.bmp");
+
+	player1.draw();
+	player2.draw();
+
+	while (!isquit)
+	{
+		Nano_RenderClear();
+
+		float timeStep = (stepTimer.getTicks() / 1000.f);
+		gamestate.inputHandler(player1, player2, event);
+		player1.move(timeStep);		
+		player2.move(timeStep);
+
+		//gamestate.checkCollision(player1, player2);
+		
+		//restart timer
+		stepTimer.start();
+		gamestate.update(player1);
+		gamestate.update(player2);
+
+		Nano_RenderPresent();
+	}
+	return 0;
+}
