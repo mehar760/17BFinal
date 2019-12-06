@@ -1,0 +1,29 @@
+void GameState::checkCollision(Player& player, Player& player2) {
+	
+	// checks collision with another player
+	if (player.xPos + player.rect.w < player2.xPos || player.xPos > player2.xPos + player2.rect.w
+		|| player.yPos + player.rect.h < player2.yPos || player.yPos > player2.yPos + player2.rect.h) {
+
+		isquit = false;
+	}	
+	else {
+		isquit = true;
+	}
+
+	//checks collision with trail
+	if (player.xPos + player.rect.w > player.activeTrail.x || player.xPos < player.activeTrail.x + player.activeTrail.w
+		|| player.yPos + player.rect.h < player2.activeTrail.y || player.yPos > player2.activeTrail.y + player2.activeTrail.h) {
+		isquit = false;
+	}
+	else {
+		isquit = true;
+	}
+
+	//checks collision with the boundary
+	if (player.xPos < 0 || player.yPos < 0 || player.xPos + player.rect.w > 640 || player.yPos + player.rect.h> 480) {
+		isquit = true;
+	}
+	if (player2.xPos < 0 || player2.yPos < 0 || player2.xPos + player2.rect.w > 640 || player2.yPos + player2.rect.h> 480) {
+		isquit = true;
+	}
+}
