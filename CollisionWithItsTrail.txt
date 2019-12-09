@@ -1,0 +1,7 @@
+	for (Nano_Rect rectangle: trails ) {
+			if (xPos > rectangle.x && xPos < rectangle.x + rectangle.w &&
+				yPos > rectangle.y && yPos < rectangle.y + rectangle.h) {
+				isquit = true;
+			}
+		}
+		
