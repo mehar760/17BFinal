@@ -1,0 +1,250 @@
+class Player {
+public:
+
+	int playerNum = 0;
+	const char* file;
+	float xPos = 10;
+	float yPos = 10;
+	float v_x = 0;
+	float v_y = 0;
+
+	int changedPos;
+
+	int prevDirection;
+	int currentDirection;
+
+	Nano_Texture* playerTex;
+	Nano_Rect rect;
+	Nano_Texture* trail;
+
+	vector<Nano_Rect> trails;
+	vector<Nano_Rect> trails2;
+
+	Nano_Rect activeTrail;
+
+
+	void init(int player, float x, float y, const char* file_path) {
+		playerNum = player;
+		xPos = x;
+		yPos = y;
+		file = file_path;
+	}
+
+	void draw() {
+		playerTex = Nano_LoadTexture(file);
+		rect = { (int)xPos, (int)yPos, 10, 10 };
+
+		trail = playerTex;
+
+		activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+	}
+
+	void getInput() {
+
+		if (playerNum == 1) {
+			switch (scancode) {
+
+				/*PLAYER 1 INPUTS */
+
+			case SDL_SCANCODE_RIGHT:
+				currentDirection = 4;
+				if (prevDirection == 3) {
+					break;
+				}
+				else {
+					changedPos = xPos;
+					trails.push_back(activeTrail);
+					activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+					if (v_x != 0 || v_y != 0) {
+						v_x = 0;
+						v_y = 0;
+					}
+					v_x += 200;
+					prevDirection = currentDirection;
+				}
+				break;
+			case SDL_SCANCODE_LEFT:
+				currentDirection = 3;
+				if (prevDirection == 4) {
+					break;
+				}
+				else {
+					changedPos = xPos;
+					trails.push_back(activeTrail);
+					activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+					if (v_x != 0 || v_y != 0) {
+						v_x = 0;
+						v_y = 0;
+					}
+					v_x -= 200;
+					prevDirection = currentDirection;
+				}
+				break;
+			case SDL_SCANCODE_UP:
+				currentDirection = 1;
+				if (prevDirection == 2) {
+					break;
+				}
+				else {
+					changedPos = yPos;
+					trails.push_back(activeTrail);
+					activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+					if (v_x != 0 || v_y != 0) {
+						v_x = 0;
+						v_y = 0;
+					}
+					v_y -= 200;
+					prevDirection = currentDirection;
+				}
+				break;
+			case SDL_SCANCODE_DOWN:
+				currentDirection = 2;
+				if (prevDirection == 1) {
+					break;
+				}
+				else {
+					changedPos = yPos;
+					trails.push_back(activeTrail);
+					activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+					if (v_x != 0 || v_y != 0) {
+						v_x = 0;
+						v_y = 0;
+					}
+					v_y += 200;
+					prevDirection = currentDirection;
+				}
+				break;
+			}
+		}
+
+		if (playerNum == 2) {
+			switch (scancode) {
+
+				/*PLAYER 1 INPUTS */
+
+			case SDL_SCANCODE_D:
+				currentDirection = 4;
+				if (prevDirection == 3) {
+					break;
+				}
+				else {
+					changedPos = xPos;
+					trails.push_back(activeTrail);
+					activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+					if (v_x != 0 || v_y != 0) {
+						v_x = 0;
+						v_y = 0;
+					}
+					v_x += 200;
+					prevDirection = currentDirection;
+				}
+				break;
+			case SDL_SCANCODE_A:
+				currentDirection = 3;
+				if (prevDirection == 4) {
+					break;
+				}
+				else {
+					changedPos = xPos;
+					trails.push_back(activeTrail);
+					activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+					if (v_x != 0 || v_y != 0) {
+						v_x = 0;
+						v_y = 0;
+					}
+					v_x -= 200;
+					prevDirection = currentDirection;
+				}
+				break;
+			case SDL_SCANCODE_W:
+				currentDirection = 1;
+				if (prevDirection == 2) {
+					break;
+				}
+				else {
+					changedPos = yPos;
+					trails.push_back(activeTrail);
+					activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+					if (v_x != 0 || v_y != 0) {
+						v_x = 0;
+						v_y = 0;
+					}
+					v_y -= 200;
+					prevDirection = currentDirection;
+				}
+				break;
+			case SDL_SCANCODE_S:
+				currentDirection = 2;
+				if (prevDirection == 1) {
+					break;
+				}
+				else {
+					changedPos = yPos;
+					trails.push_back(activeTrail);
+					activeTrail = { (int)xPos, (int)yPos, 10, 10 };
+					if (v_x != 0 || v_y != 0) {
+						v_x = 0;
+						v_y = 0;
+					}
+					v_y += 200;
+					prevDirection = currentDirection;
+				}
+				break;
+			}
+		}
+	};
+
+	void move(float timeStep) {
+		xPos += v_x * timeStep;
+		yPos += v_y * timeStep;
+
+		xPos += v_x * timeStep;
+		yPos += v_y * timeStep;
+
+		//render player	
+		rect.x = xPos;
+		rect.y = yPos;
+
+		if (v_x > 0) {
+			activeTrail.w = xPos - activeTrail.x;
+		}
+		if (v_x < 0) {
+			activeTrail.x = xPos + 11 ;
+			activeTrail.w = changedPos - xPos;
+		}
+		if (v_y > 0) {
+			activeTrail.h = yPos - activeTrail.y;
+		}
+		if (v_y < 0) {
+			activeTrail.y = yPos + 11;
+			activeTrail.h = changedPos - yPos;
+		}
+
+
+
+		//checks collision with the other player
+		//if (player_x + rect.w < player2_x || player_x > player2_x + rect2.w
+		//	|| player_y + rect.h < player2_y || player_y > player2_y + rect2.h) {
+		//
+		//	isquit = false;
+		//}
+		//else {
+		//	isquit = true;
+		//}
+
+
+		// checks collision with the trail
+		//for (Nano_Rect rectangle: trails ) {
+		//	if (xPos > rectangle.x && xPos < rectangle.x + rectangle.w &&
+		//		yPos > rectangle.y && yPos < rectangle.y + rectangle.h) {
+		//		isquit = true;
+		//	}
+		//}
+		
+		// checks collision with the boundary
+		//if (xPos < 0 || yPos < 0 || xPos + rect.w > 640 || yPos + rect.h > 480) {
+		//	isquit = true;
+		//}
+
+	}
+};
