@@ -1,0 +1,58 @@
+void GameState::checkCollision(Player& player, Player& player2) {	
+	// checks collision with another player
+	if (player.xPos + player.rect.w < player2.xPos || player.xPos > player2.xPos + player2.rect.w
+		|| player.yPos + player.rect.h < player2.yPos || player.yPos > player2.yPos + player2.rect.h) {
+		isquit = false;
+	}	
+	else {
+		isquit = true;
+	}
+	
+	//checks player 1 collision with own trail
+	for (Nano_Rect rectangle : player.trails) {
+		if (player.xPos > rectangle.x&& player.xPos < rectangle.x + rectangle.w &&
+			player.yPos > rectangle.y&& player.yPos < rectangle.y + rectangle.h) {
+			isquit = true;
+		}
+	}
+
+	//checks player 1 collision with player2 trail	
+	if (player.xPos > player2.activeTrail.x&& player.xPos < player2.activeTrail.x + player2.activeTrail.w&&
+		player.yPos > player2.activeTrail.y&& player.yPos < player2.activeTrail.y + player2.activeTrail.h) {
+		isquit = true;
+	}
+	for (Nano_Rect rectangle : player2.trails) {
+		if (player.xPos > rectangle.x&& player.xPos < rectangle.x + rectangle.w &&
+			player.yPos > rectangle.y&& player.yPos < rectangle.y + rectangle.h) {
+			isquit = true;
+		}
+	}
+	
+	//checks player 2 collision with own trail
+	for (Nano_Rect rectangle : player2.trails) {
+		if (player2.xPos > rectangle.x&& player2.xPos < rectangle.x + rectangle.w &&
+			player2.yPos > rectangle.y&& player2.yPos < rectangle.y + rectangle.h) {
+			isquit = true;
+		}
+	}
+
+	//checks player 2 collision with player1 trail
+	if (player2.xPos > player.activeTrail.x&& player2.xPos < player.activeTrail.x + player.activeTrail.w &&
+		player2.yPos > player.activeTrail.y&& player2.yPos < player.activeTrail.y + player.activeTrail.h) {
+		isquit = true;
+	}
+	for (Nano_Rect rectangle : player.trails) {
+		if (player2.xPos > rectangle.x&& player2.xPos < rectangle.x + rectangle.w &&
+			player2.yPos > rectangle.y&& player2.yPos < rectangle.y + rectangle.h) {
+			isquit = true;
+		}
+	}
+	
+	//checks collision with the boundary
+	if (player.xPos < 0 || player.yPos < 0 || player.xPos + player.rect.w > 640 || player.yPos + player.rect.h> 480) {
+		isquit = true;
+	}
+	if (player2.xPos < 0 || player2.yPos < 0 || player2.xPos + player2.rect.w > 640 || player2.yPos + player2.rect.h> 480) {
+		isquit = true;
+	}	
+}
